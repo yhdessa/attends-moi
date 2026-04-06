@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: attends-moi
+
+resources:
+  - namespace.yaml
+  - configmaps/backend-config.yaml
+  - secrets/postgres-secret.yaml
+  - deployments/postgres.yaml
+  - deployments/backend.yaml
+  - deployments/frontend.yaml
+  - services/postgres.yaml
+  - services/backend.yaml
+  - services/frontend.yaml
+  - pvc/postgres-pvc.yaml
+  - ingress.yaml

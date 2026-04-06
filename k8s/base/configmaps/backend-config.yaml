@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: attends-moi
+data:
+  PORT: "8080"
+  DATABASE_URL: "postgres://postgres:postgres@postgres:5432/attends_moi?sslmode=disable"
