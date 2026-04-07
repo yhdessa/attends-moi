@@ -39,7 +39,7 @@ func (r *CardRepo) GetByBoardID(ctx context.Context, boardID string) ([]model.Ca
 	}
 	defer rows.Close()
 
-	var cards []model.Card
+	cards := make([]model.Card, 0)
 	for rows.Next() {
 		var c model.Card
 		if err := rows.Scan(&c.ID, &c.BoardID, &c.Title, &c.Description, &c.Status, &c.Priority, &c.Labels, &c.Assignee, &c.CreatedAt, &c.UpdatedAt); err != nil {

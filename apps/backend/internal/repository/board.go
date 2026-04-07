@@ -34,7 +34,7 @@ func (r *BoardRepo) GetAll(ctx context.Context) ([]model.Board, error) {
 	}
 	defer rows.Close()
 
-	var boards []model.Board
+	boards := make([]model.Board, 0)
 	for rows.Next() {
 		var b model.Board
 		if err := rows.Scan(&b.ID, &b.Title, &b.Description, &b.CreatedAt, &b.UpdatedAt); err != nil {

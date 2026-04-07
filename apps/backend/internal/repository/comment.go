@@ -36,7 +36,7 @@ func (r *CommentRepo) GetByCardID(ctx context.Context, cardID string) ([]model.C
 	}
 	defer rows.Close()
 
-	var comments []model.Comment
+	comments := make([]model.Comment, 0)
 	for rows.Next() {
 		var c model.Comment
 		if err := rows.Scan(&c.ID, &c.CardID, &c.Author, &c.Body, &c.CreatedAt); err != nil {

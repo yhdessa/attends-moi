@@ -11,7 +11,7 @@ const newBoardTitle = ref('')
 const newBoardDesc = ref('')
 
 onMounted(async () => {
-  boards.value = await getBoboards()
+  boards.value = await getBoards()
 })
 
 async function handleCreateBoard() {
