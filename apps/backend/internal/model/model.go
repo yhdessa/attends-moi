@@ -38,6 +38,7 @@ type Card struct {
 	Priority    CardPriority `json:"priority"`
 	Labels      []string   `json:"labels"`
 	Assignee    string     `json:"assignee"`
+	DueDate     *time.Time     `json:"due_date,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 }
