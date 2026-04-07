@@ -15,6 +15,7 @@ export interface Card {
   priority: CardPriority
   labels: string[]
   assignee: string
+  due_date?: string
   created_at: string
   updated_at: string
 }
@@ -29,7 +30,6 @@ export interface Comment {
   author: string
   body: string
   created_at: string
-  due_date?: string
 }
 
 export const COLUMNS: { key: CardStatus; label: string; color: string }[] = [

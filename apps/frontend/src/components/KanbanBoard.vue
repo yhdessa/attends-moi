@@ -7,14 +7,14 @@ import KanbanCard from './KanbanCard.vue'
 import CreateCardModal from './CreateCardModal.vue'
 
 const props = defineProps<{ board: Board }>()
-const emit = defineEmits<{ back: [] }>()
 
 const cards = ref<Card[]>([])
 const showCreateModal = ref(false)
 const draggedCardId = ref<string | null>(null)
 
 onMounted(async () => {
-  cards.value = await getCards(props.board.id)
+  const fetched = await getCards(props.board.id)
+  cards.value = fetched || []
 })
 
 function cardsByStatus(status: CardStatus) {
@@ -59,7 +59,7 @@ async function handleDrop(event: DragEvent, status: CardStatus) {
 <template>
   <div>
     <div class="flex items-center gap-4 mb-6">
-      <button class="btn btn-ghost btn-sm" @click="emit('back')">← Back</button>
+      <router-link to="/" class="btn btn-ghost btn-sm">← Back</router-link>
       <h2 class="text-2xl font-bold">{{ board.title }}</h2>
       <button class="btn btn-primary btn-sm ml-auto" @click="showCreateModal = true">
         + Add Card

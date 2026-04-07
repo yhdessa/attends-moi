@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/yhdessa/attends-moi/internal/model"
@@ -27,6 +28,7 @@ func (h *CardHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Priority    model.CardPriority `json:"priority"`
 		Labels      []string           `json:"labels"`
 		Assignee    string             `json:"assignee"`
+		DueDate     *time.Time         `json:"due_date"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
@@ -41,7 +43,7 @@ func (h *CardHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Priority:    input.Priority,
 		Labels:      input.Labels,
 		Assignee:    input.Assignee,
-		DueDate: input.DueDate,
+		DueDate:     input.DueDate,
 	}
 	if card.Status == "" {
 		card.Status = model.StatusBacklog
@@ -100,9 +102,6 @@ func (h *CardHandler) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "card not found", http.StatusNotFound)
 		return
 	}
-	if input.DueDate != nil {
-		card.DueDate = input.DueDate
-	}
 
 	var input struct {
 		Title       *string             `json:"title"`
@@ -111,7 +110,7 @@ func (h *CardHandler) Update(w http.ResponseWriter, r *http.Request) {
 		Priority    *model.CardPriority `json:"priority"`
 		Labels      *[]string           `json:"labels"`
 		Assignee    *string             `json:"assignee"`
-		DueDate *time.Time `json:"due_date"`
+		DueDate     *time.Time          `json:"due_date"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
@@ -135,6 +134,9 @@ func (h *CardHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if input.Assignee != nil {
 		card.Assignee = *input.Assignee
+	}
+	if input.DueDate != nil {
+		card.DueDate = input.DueDate
 	}
 
 	if err := h.repo.Update(r.Context(), card); err != nil {

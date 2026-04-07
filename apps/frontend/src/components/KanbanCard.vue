@@ -52,11 +52,7 @@ async function addComment(author: string, body: string) {
       </p>
 
       <div class="flex flex-wrap gap-1 mt-1">
-        <span
-          v-for="label in card.labels"
-          :key="label"
-          class="badge badge-xs badge-outline"
-        >
+        <span v-for="label in card.labels" :key="label" class="badge badge-xs badge-outline">
           {{ label }}
         </span>
         <span :class="['badge badge-xs', PRIORITY_COLORS[card.priority]]">
@@ -97,10 +93,7 @@ async function addComment(author: string, body: string) {
       </div>
 
       <div class="mt-4">
-        <CommentSection
-          :comments="comments"
-          @add-comment="addComment"
-        />
+        <CommentSection :comments="comments" @add-comment="addComment" />
       </div>
 
       <div class="modal-action">

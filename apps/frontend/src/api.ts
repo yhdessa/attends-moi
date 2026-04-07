@@ -4,7 +4,8 @@ const API = '/api'
 
 export async function getBoards(): Promise<Board[]> {
   const res = await fetch(`${API}/boards`)
-  return res.json()
+  const data = await res.json()
+  return data || []
 }
 
 export async function createBoard(title: string, description: string): Promise<Board> {
@@ -18,7 +19,8 @@ export async function createBoard(title: string, description: string): Promise<B
 
 export async function getCards(boardId: string): Promise<Card[]> {
   const res = await fetch(`${API}/boards/${boardId}/cards`)
-  return res.json()
+  const data = await res.json()
+  return data || []
 }
 
 export async function createCard(boardId: string, card: Partial<Card>): Promise<Card> {
@@ -45,7 +47,8 @@ export async function deleteCard(id: string): Promise<void> {
 
 export async function getComments(cardId: string): Promise<Comment[]> {
   const res = await fetch(`${API}/cards/${cardId}/comments`)
-  return res.json()
+  const data = await res.json()
+  return data || []
 }
 
 export async function createComment(cardId: string, author: string, body: string): Promise<Comment> {
