@@ -25,7 +25,7 @@ func (r *CardRepo) Create(ctx context.Context, card *model.Card) error {
 	`
 	return r.pool.QueryRow(ctx, query,
 		card.BoardID, card.Title, card.Description,
-		card.Status, card.Priority, card.Labels, card.Assignee,
+		card.Status, card.Priority, card.Labels, card.Assignee, card.Duedate,
 	).Scan(&card.ID, &card.CreatedAt, &card.UpdatedAt)
 }
 
