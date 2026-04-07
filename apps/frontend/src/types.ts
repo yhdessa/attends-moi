@@ -29,6 +29,7 @@ export interface Comment {
   author: string
   body: string
   created_at: string
+  due_date?: string
 }
 
 export const COLUMNS: { key: CardStatus; label: string; color: string }[] = [

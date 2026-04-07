@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/yourusername/attends-moi/internal/model"
+	"github.com/yhdessa/attends-moi/internal/model"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -19,19 +19,19 @@ func NewCardRepo(pool *pgxpool.Pool) *CardRepo {
 
 func (r *CardRepo) Create(ctx context.Context, card *model.Card) error {
 	query := `
-		INSERT INTO cards (board_id, title, description, status, priority, labels, assignee)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO cards (board_id, title, description, status, priority, labels, assignee, due_date)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id, created_at, updated_at
 	`
 	return r.pool.QueryRow(ctx, query,
 		card.BoardID, card.Title, card.Description,
-		card.Status, card.Priority, card.Labels, card.Assignee, card.Duedate,
+		card.Status, card.Priority, card.Labels, card.Assignee, card.DueDate,
 	).Scan(&card.ID, &card.CreatedAt, &card.UpdatedAt)
 }
 
 func (r *CardRepo) GetByBoardID(ctx context.Context, boardID string) ([]model.Card, error) {
 	rows, err := r.pool.Query(ctx,
-		"SELECT id, board_id, title, description, status, priority, labels, assignee, created_at, updated_at FROM cards WHERE board_id = $1 ORDER BY created_at DESC",
+		"SELECT id, board_id, title, description, status, priority, labels, assignee, due_date, created_at, updated_at FROM cards WHERE board_id = $1 ORDER BY created_at DESC",
 		boardID,
 	)
 	if err != nil {
@@ -42,7 +42,7 @@ func (r *CardRepo) GetByBoardID(ctx context.Context, boardID string) ([]model.Ca
 	cards := make([]model.Card, 0)
 	for rows.Next() {
 		var c model.Card
-		if err := rows.Scan(&c.ID, &c.BoardID, &c.Title, &c.Description, &c.Status, &c.Priority, &c.Labels, &c.Assignee, &c.CreatedAt, &c.UpdatedAt); err != nil {
+		if err := rows.Scan(&c.ID, &c.BoardID, &c.Title, &c.Description, &c.Status, &c.Priority, &c.Labels, &c.Assignee, &c.DueDate, &c.CreatedAt, &c.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan card: %w", err)
 		}
 		cards = append(cards, c)
@@ -52,8 +52,8 @@ func (r *CardRepo) GetByBoardID(ctx context.Context, boardID string) ([]model.Ca
 
 func (r *CardRepo) GetByID(ctx context.Context, id string) (*model.Card, error) {
 	var c model.Card
-	query := "SELECT id, board_id, title, description, status, priority, labels, assignee, created_at, updated_at FROM cards WHERE id = $1"
-	err := r.pool.QueryRow(ctx, query, id).Scan(&c.ID, &c.BoardID, &c.Title, &c.Description, &c.Status, &c.Priority, &c.Labels, &c.Assignee, &c.CreatedAt, &c.UpdatedAt)
+	query := "SELECT id, board_id, title, description, status, priority, labels, assignee, due_date, created_at, updated_at FROM cards WHERE id = $1"
+	err := r.pool.QueryRow(ctx, query, id).Scan(&c.ID, &c.BoardID, &c.Title, &c.Description, &c.Status, &c.Priority, &c.Labels, &c.Assignee, &c.DueDate, &c.CreatedAt, &c.UpdatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, nil
@@ -65,12 +65,12 @@ func (r *CardRepo) GetByID(ctx context.Context, id string) (*model.Card, error) 
 
 func (r *CardRepo) Update(ctx context.Context, card *model.Card) error {
 	query := `
-		UPDATE cards SET title = $2, description = $3, status = $4, priority = $5, labels = $6, assignee = $7, updated_at = NOW()
+		UPDATE cards SET title = $2, description = $3, status = $4, priority = $5, labels = $6, assignee = $7, due_date = $8, updated_at = NOW()
 		WHERE id = $1
 		RETURNING updated_at
 	`
 	return r.pool.QueryRow(ctx, query,
-		card.ID, card.Title, card.Description, card.Status, card.Priority, card.Labels, card.Assignee,
+		card.ID, card.Title, card.Description, card.Status, card.Priority, card.Labels, card.Assignee, card.DueDate,
 	).Scan(&card.UpdatedAt)
 }
 

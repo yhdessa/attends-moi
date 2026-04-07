@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/yourusername/attends-moi/internal/model"
+	"github.com/yhdessa/attends-moi/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

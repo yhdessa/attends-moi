@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/yourusername/attends-moi/internal/model"
-	"github.com/yourusername/attends-moi/internal/repository"
+	"github.com/yhdessa/attends-moi/internal/model"
+	"github.com/yhdessa/attends-moi/internal/repository"
 )
 
 type CardHandler struct {
@@ -41,6 +41,7 @@ func (h *CardHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Priority:    input.Priority,
 		Labels:      input.Labels,
 		Assignee:    input.Assignee,
+		DueDate: input.DueDate,
 	}
 	if card.Status == "" {
 		card.Status = model.StatusBacklog
@@ -99,6 +100,9 @@ func (h *CardHandler) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "card not found", http.StatusNotFound)
 		return
 	}
+	if input.DueDate != nil {
+		card.DueDate = input.DueDate
+	}
 
 	var input struct {
 		Title       *string             `json:"title"`
@@ -107,6 +111,7 @@ func (h *CardHandler) Update(w http.ResponseWriter, r *http.Request) {
 		Priority    *model.CardPriority `json:"priority"`
 		Labels      *[]string           `json:"labels"`
 		Assignee    *string             `json:"assignee"`
+		DueDate *time.Time `json:"due_date"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)

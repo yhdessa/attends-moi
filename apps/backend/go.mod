@@ -1,4 +1,4 @@
-module github.com/yourusername/attends-moi
+module github.com/yhdessa/attends-moi
 
 go 1.22
 

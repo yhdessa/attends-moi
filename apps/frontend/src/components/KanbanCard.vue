@@ -9,6 +9,7 @@ const props = defineProps<{ card: Card }>()
 const emit = defineEmits<{
   'status-change': [cardId: string, status: CardStatus]
   delete: [cardId: string]
+  'drag-start': [cardId: string]
 }>()
 
 const showDetails = ref(false)
@@ -28,6 +29,8 @@ async function addComment(author: string, body: string) {
 <template>
   <div
     class="card bg-base-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+    draggable="true"
+    @dragstart="emit('drag-start', card.id)"
     @click="openDetails"
   >
     <div class="card-body p-4">
@@ -61,6 +64,11 @@ async function addComment(author: string, body: string) {
         </span>
       </div>
 
+      <div v-if="card.due_date" class="flex items-center gap-1 mt-1 text-xs text-base-content/60">
+        <span>📅</span>
+        <span>{{ new Date(card.due_date).toLocaleDateString() }}</span>
+      </div>
+
       <div v-if="card.assignee" class="flex items-center gap-1 mt-1">
         <div class="avatar placeholder">
           <div class="bg-neutral text-neutral-content rounded-full w-5">
@@ -82,6 +90,10 @@ async function addComment(author: string, body: string) {
         <span v-for="label in card.labels" :key="label" class="badge badge-outline">
           {{ label }}
         </span>
+      </div>
+
+      <div v-if="card.due_date" class="mt-2 text-sm">
+        <span class="font-semibold">Due:</span> {{ new Date(card.due_date).toLocaleString() }}
       </div>
 
       <div class="mt-4">

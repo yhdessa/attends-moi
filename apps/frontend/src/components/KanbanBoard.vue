@@ -11,6 +11,7 @@ const emit = defineEmits<{ back: [] }>()
 
 const cards = ref<Card[]>([])
 const showCreateModal = ref(false)
+const draggedCardId = ref<string | null>(null)
 
 onMounted(async () => {
   cards.value = await getCards(props.board.id)
@@ -36,6 +37,23 @@ async function handleDelete(cardId: string) {
   await deleteCard(cardId)
   cards.value = cards.value.filter((c) => c.id !== cardId)
 }
+
+function handleDragStart(cardId: string) {
+  draggedCardId.value = cardId
+}
+
+async function handleDrop(event: DragEvent, status: CardStatus) {
+  event.preventDefault()
+  if (!draggedCardId.value) return
+
+  const card = cards.value.find((c) => c.id === draggedCardId.value)
+  if (card && card.status !== status) {
+    const updated = await updateCard(draggedCardId.value, { status })
+    const idx = cards.value.findIndex((c) => c.id === draggedCardId.value)
+    if (idx !== -1) cards.value[idx] = updated
+  }
+  draggedCardId.value = null
+}
 </script>
 
 <template>
@@ -53,6 +71,8 @@ async function handleDelete(cardId: string) {
         v-for="col in COLUMNS"
         :key="col.key"
         class="min-w-[280px] flex-1 bg-base-200 rounded-xl p-3"
+        @dragover.prevent
+        @drop="handleDrop($event, col.key)"
       >
         <div class="flex items-center gap-2 mb-3">
           <span :class="['w-3 h-3 rounded-full', col.color]"></span>
@@ -67,6 +87,7 @@ async function handleDelete(cardId: string) {
             :card="card"
             @status-change="handleStatusChange"
             @delete="handleDelete"
+            @drag-start="handleDragStart"
           />
         </div>
       </div>

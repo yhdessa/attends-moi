@@ -14,8 +14,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
-	"github.com/yourusername/attends-moi/internal/handler"
-	"github.com/yourusername/attends-moi/internal/repository"
+	"github.com/yhdessa/attends-moi/internal/handler"
+	"github.com/yhdessa/attends-moi/internal/repository"
 )
 
 func main() {

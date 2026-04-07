@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/yourusername/attends-moi/internal/model"
-	"github.com/yourusername/attends-moi/internal/repository"
+	"github.com/yhdessa/attends-moi/internal/model"
+	"github.com/yhdessa/attends-moi/internal/repository"
 )
 
 type BoardHandler struct {

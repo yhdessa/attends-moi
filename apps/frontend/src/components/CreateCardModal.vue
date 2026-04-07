@@ -27,8 +27,9 @@ function handleSubmit() {
     status: status.value,
     priority: priority.value,
     labels,
+    due_date: dueDate.value || undefined,
   })
-
+  dueDate.value = ''
   title.value = ''
   description.value = ''
   assignee.value = ''
@@ -50,7 +51,10 @@ function handleSubmit() {
         <label class="label"><span class="label-text">Description</span></label>
         <textarea v-model="description" class="textarea textarea-bordered" placeholder="Details..."></textarea>
       </div>
-
+      <div class="form-control mt-2">
+	<label class="label"><span class="label-text">Due Date</span></label>
+	<input v-model="dueDate" type="datetime-local" class="input input-bordered" />
+      </div>
       <div class="grid grid-cols-2 gap-4 mt-2">
         <div class="form-control">
           <label class="label"><span class="label-text">Status</span></label>
