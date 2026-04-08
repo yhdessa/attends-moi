@@ -64,3 +64,40 @@ func (h *BoardHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(board)
 }
+
+func (h *BoardHandler) Update(w http.ResponseWriter, r *http.Request) {
+    id := chi.URLParam(r, "id")
+    board, err := h.repo.GetByID(r.Context(), id)
+    if err != nil {
+        http.Error(w, "failed to fetch board", http.StatusInternalServerError)
+        return
+    }
+    if board == nil {
+        http.Error(w, "board not found", http.StatusNotFound)
+        return
+    }
+
+    var input struct {
+        Title       *string `json:"title"`
+        Description *string `json:"description"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, "invalid request body", http.StatusBadRequest)
+        return
+    }
+
+    if input.Title != nil {
+        board.Title = *input.Title
+    }
+    if input.Description != nil {
+        board.Description = *input.Description
+    }
+
+    if err := h.repo.Update(r.Context(), board); err != nil {
+        http.Error(w, "failed to update board", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(board)
+}

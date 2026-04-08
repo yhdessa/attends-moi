@@ -71,6 +71,7 @@ func main() {
 			r.Post("/", boardHandler.Create)
 			r.Get("/", boardHandler.GetAll)
 			r.Get("/{id}", boardHandler.GetByID)
+			r.Patch("/{id}", boardHandler.Update)
 			r.Get("/{boardID}/cards", cardHandler.GetByBoardID)
 			r.Post("/{boardID}/cards", cardHandler.Create)
 		})

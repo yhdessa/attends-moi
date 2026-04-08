@@ -57,3 +57,13 @@ func (r *BoardRepo) GetByID(ctx context.Context, id string) (*model.Board, error
 	}
 	return &b, nil
 }
+
+func (r *BoardRepo) Update(ctx context.Context, board *model.Board) error {
+    query := `
+        UPDATE boards SET title = $2, description = $3, updated_at = NOW()
+        WHERE id = $1
+        RETURNING updated_at
+    `
+    return r.pool.QueryRow(ctx, query, board.ID, board.Title, board.Description).
+        Scan(&board.UpdatedAt)
+}

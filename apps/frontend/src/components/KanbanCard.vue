@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Card, CardStatus, Comment } from '../types'
+import type { Card, CardStatus, Comment, CardPriority } from '../types'
 import { COLUMNS, PRIORITY_COLORS } from '../types'
 import { getComments, createComment } from '../api'
 import CommentSection from './CommentSection.vue'
@@ -10,19 +10,73 @@ const emit = defineEmits<{
   'status-change': [cardId: string, status: CardStatus]
   delete: [cardId: string]
   'drag-start': [cardId: string]
+  update: [cardId: string, patch: Partial<Card>]
 }>()
 
 const showDetails = ref(false)
 const comments = ref<Comment[]>([])
 
+const editTitle = ref('')
+const editDescription = ref('')
+const editAssignee = ref('')
+const editLabels = ref('')
+const editStatus = ref<CardStatus>('backlog')
+const editPriority = ref<CardPriority>('medium')
+const editDueDate = ref('')
+
+function toDateTimeLocal(value?: string) {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  const pad = (num: number) => String(num).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+    date.getHours(),
+  )}:${pad(date.getMinutes())}`
+}
+
+function syncEditFields() {
+  editTitle.value = props.card.title
+  editDescription.value = props.card.description
+  editAssignee.value = props.card.assignee
+  editLabels.value = (props.card.labels || []).join(', ')
+  editStatus.value = props.card.status
+  editPriority.value = props.card.priority
+  editDueDate.value = toDateTimeLocal(props.card.due_date)
+}
+
 async function openDetails() {
   showDetails.value = true
+  syncEditFields()
   comments.value = await getComments(props.card.id)
 }
 
 async function addComment(author: string, body: string) {
   const comment = await createComment(props.card.id, author, body)
   comments.value.push(comment)
+}
+
+function saveEdits() {
+  if (!editTitle.value.trim()) return
+
+  const labels = editLabels.value
+    .split(',')
+    .map((label) => label.trim())
+    .filter(Boolean)
+
+  const dueDateValue = editDueDate.value ? new Date(editDueDate.value) : null
+  const dueDateISO =
+    dueDateValue && !Number.isNaN(dueDateValue.getTime()) ? dueDateValue.toISOString() : undefined
+
+  emit('update', props.card.id, {
+    title: editTitle.value,
+    description: editDescription.value,
+    assignee: editAssignee.value,
+    labels,
+    status: editStatus.value,
+    priority: editPriority.value,
+    due_date: dueDateISO,
+  })
+  showDetails.value = false
 }
 </script>
 
@@ -78,18 +132,50 @@ async function addComment(author: string, body: string) {
 
   <dialog :class="{ modal: true, 'modal-open': showDetails }">
     <div class="modal-box">
-      <h3 class="text-lg font-bold">{{ card.title }}</h3>
-      <p class="text-sm text-base-content/60 mt-2">{{ card.description }}</p>
+      <h3 class="text-lg font-bold">Edit Card</h3>
 
-      <div class="flex flex-wrap gap-2 mt-3">
-        <span :class="['badge', PRIORITY_COLORS[card.priority]]">{{ card.priority }}</span>
-        <span v-for="label in card.labels" :key="label" class="badge badge-outline">
-          {{ label }}
-        </span>
+      <div class="form-control mt-4">
+        <label class="label"><span class="label-text">Title</span></label>
+        <input v-model="editTitle" type="text" class="input input-bordered" />
       </div>
 
-      <div v-if="card.due_date" class="mt-2 text-sm">
-        <span class="font-semibold">Due:</span> {{ new Date(card.due_date).toLocaleString() }}
+      <div class="form-control mt-2">
+        <label class="label"><span class="label-text">Description</span></label>
+        <textarea v-model="editDescription" class="textarea textarea-bordered"></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mt-2">
+        <div class="form-control">
+          <label class="label"><span class="label-text">Status</span></label>
+          <select v-model="editStatus" class="select select-bordered">
+            <option v-for="col in COLUMNS" :key="col.key" :value="col.key">{{ col.label }}</option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text">Priority</span></label>
+          <select v-model="editPriority" class="select select-bordered">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-control mt-2">
+        <label class="label"><span class="label-text">Due Date</span></label>
+        <input v-model="editDueDate" type="datetime-local" class="input input-bordered" />
+      </div>
+
+      <div class="form-control mt-2">
+        <label class="label"><span class="label-text">Assignee</span></label>
+        <input v-model="editAssignee" type="text" class="input input-bordered" />
+      </div>
+
+      <div class="form-control mt-2">
+        <label class="label"><span class="label-text">Labels (comma-separated)</span></label>
+        <input v-model="editLabels" type="text" class="input input-bordered" />
       </div>
 
       <div class="mt-4">
@@ -97,7 +183,8 @@ async function addComment(author: string, body: string) {
       </div>
 
       <div class="modal-action">
-        <button class="btn btn-sm" @click="showDetails = false">Close</button>
+        <button class="btn btn-ghost btn-sm" @click="showDetails = false">Close</button>
+        <button class="btn btn-primary btn-sm" @click="saveEdits">Save</button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">

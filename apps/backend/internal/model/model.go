@@ -36,6 +36,7 @@ type Card struct {
 	Description string     `json:"description"`
 	Status      CardStatus `json:"status"`
 	Priority    CardPriority `json:"priority"`
+	Position    float64   `json:"position"`
 	Labels      []string   `json:"labels"`
 	Assignee    string     `json:"assignee"`
 	DueDate     *time.Time     `json:"due_date,omitempty"`

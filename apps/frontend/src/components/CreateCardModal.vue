@@ -21,6 +21,10 @@ function handleSubmit() {
     .map((l) => l.trim())
     .filter(Boolean)
 
+  const dueDateValue = dueDate.value ? new Date(dueDate.value) : null
+  const dueDateISO =
+    dueDateValue && !Number.isNaN(dueDateValue.getTime()) ? dueDateValue.toISOString() : undefined
+
   emit('create', {
     title: title.value,
     description: description.value,
@@ -28,7 +32,7 @@ function handleSubmit() {
     status: status.value,
     priority: priority.value,
     labels,
-    due_date: dueDate.value || undefined,
+    due_date: dueDateISO,
   })
 
   title.value = ''

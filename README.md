@@ -58,7 +58,9 @@ attends-moi/
 
 2. **Run migrations:**
    ```bash
-   psql -U postgres -h localhost -d attends_moi -f apps/backend/migrations/001_init.sql
+   for f in apps/backend/migrations/*.sql; do
+     psql -U postgres -h localhost -d attends_moi -f "$f"
+   done
    ```
 
 3. **Start backend:**

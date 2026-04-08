@@ -8,11 +8,26 @@ export async function getBoards(): Promise<Board[]> {
   return data || []
 }
 
+export async function getBoard(id: string): Promise<Board | null> {
+  const res = await fetch(`${API}/boards/${id}`)
+  if (!res.ok) return null
+  return res.json()
+}
+
 export async function createBoard(title: string, description: string): Promise<Board> {
   const res = await fetch(`${API}/boards`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title, description }),
+  })
+  return res.json()
+}
+
+export async function updateBoard(id: string, board: Partial<Board>): Promise<Board> {
+  const res = await fetch(`${API}/boards/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(board),
   })
   return res.json()
 }

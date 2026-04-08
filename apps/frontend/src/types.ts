@@ -13,6 +13,7 @@ export interface Card {
   description: string
   status: CardStatus
   priority: CardPriority
+  position: number
   labels: string[]
   assignee: string
   due_date?: string
